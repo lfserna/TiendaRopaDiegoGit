@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Consulta de Pedido{% endblock %}
+
+{% block content %}
+<section class="card fade-up">
+    <h1>Consulta de pedido</h1>
+    <p>Codigo consultado: <strong>{{ code }}</strong></p>
+    <p>Grupo relacionado: <strong>{{ principal.pedido_grupo_id }}</strong></p>
+    <p>Estado actual: <span class="status-pill">{{ principal.estado }}</span></p>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Codigo</th>
+                    <th>Tipo entrega</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Lugar/Ciudad</th>
+                    <th>Costo total</th>
+                    <th>Estado</th>
+                    <th>Registro</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.codigo_producto }}</td>
+                        <td>{{ order.tipo_entrega }}</td>
+                        <td>{{ order.fecha_entrega or '-' }}</td>
+                        <td>{{ order.hora_entrega or '-' }}</td>
+                        <td>{{ order.lugar_entrega or order.ciudad_destino }}</td>
+                        <td>{{ order.costo_total_pedido or '-' }}</td>
+                        <td><span class="status-pill">{{ order.estado }}</span></td>
+                        <td>{{ order.fecha_registro }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

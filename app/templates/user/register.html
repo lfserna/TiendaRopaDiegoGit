@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}Registrar Pedido{% endblock %}
+
+{% block content %}
+<section class="card fade-up">
+    <h1>Registro de pedido</h1>
+    <p>Completa tus datos solo una vez. Si tienes mas productos, agrega sus codigos al final.</p>
+
+    <form method="post" action="{{ url_for('user.registro_preview') }}" id="order-form" class="form-grid">
+        <div class="full-row">
+            <h3>1) Tipo de entrega</h3>
+            <div class="option-cards">
+                <label class="option-card">
+                    <input type="radio" name="tipo_entrega" value="Entrega personal" required>
+                    <span>Entrega personal en Santa Cruz</span>
+                </label>
+                <label class="option-card">
+                    <input type="radio" name="tipo_entrega" value="Envio" required>
+                    <span>Envio a otro departamento o provincia</span>
+                </label>
+            </div>
+        </div>
+
+        <label>Codigo principal de pedido *</label>
+        <input name="codigo_principal" value="{{ code }}" placeholder="KD-27-M" maxlength="7" required>
+        <small class="code-feedback" data-code-feedback>Formato esperado: AA-00-A</small>
+
+        <label>Nombre *</label>
+        <input name="nombre" required>
+
+        <div class="form-field envio-only hidden">
+            <label>Apellido *</label>
+            <input name="apellido">
+        </div>
+
+        <label>Numero de telefono *</label>
+        <input name="telefono" placeholder="Ejemplo: 70000000" required>
+
+        <div class="form-field personal-only hidden">
+            <label>Dia de entrega *</label>
+            <select name="fecha_entrega">
+                <option value="">Seleccionar dia</option>
+                {% for item in options.dias %}
+                    <option value="{{ item.valor }}">{{ item.valor }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-field personal-only hidden">
+            <label>Hora de entrega *</label>
+            <select name="hora_entrega">
+                <option value="">Seleccionar hora</option>
+                {% for item in options.horarios %}
+                    <option value="{{ item.valor }}">{{ item.valor }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-field personal-only hidden">
+            <label>Lugar de entrega *</label>
+            <select name="lugar_entrega">
+                <option value="">Seleccionar lugar</option>
+                {% for item in options.lugares %}
+                    <option value="{{ item.valor }}">{{ item.valor }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-field envio-only hidden">
+            <label>Ciudad / destino *</label>
+            <select name="ciudad_destino">
+                <option value="">Seleccionar destino</option>
+                {% for item in options.ciudades %}
+                    <option value="{{ item.valor }}">{{ item.valor }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-field envio-only hidden full-row">
+            <label>Direccion o referencia (opcional)</label>
+            <input name="direccion_referencia">
+        </div>
+
+        <label>Costo total del pedido *</label>
+        <input name="costo_total_pedido" type="number" min="0" step="0.01" required>
+
+        <div class="full-row">
+            <label>Tienes mas productos?</label>
+            <div class="inline-radio">
+                <label><input type="radio" name="mas_productos" value="no" checked> No</label>
+                <label><input type="radio" name="mas_productos" value="si"> Si</label>
+            </div>
+        </div>
+
+        <div id="extra-codes-wrap" class="full-row hidden">
+            <h3>Codigos adicionales</h3>
+            <div id="extra-codes"></div>
+            <button type="button" id="add-code-btn" class="btn btn-secondary">Agregar codigo</button>
+        </div>
+
+        <div class="full-row">
+            <button type="submit" class="btn btn-primary">Previsualizar pedido</button>
+        </div>
+    </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/user.js') }}?v=20260409"></script>
+{% endblock %}

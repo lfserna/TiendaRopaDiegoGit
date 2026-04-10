@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Previsualizacion{% endblock %}
+
+{% block content %}
+<section class="card fade-up">
+    <h1>Revisa tu pedido antes de confirmar</h1>
+
+    <div class="summary-grid">
+        <div><strong>Nombre:</strong> {{ payload.nombre }} {{ payload.apellido }}</div>
+        <div><strong>Telefono:</strong> {{ payload.telefono }}</div>
+        <div><strong>Tipo de entrega:</strong> {{ payload.tipo_entrega }}</div>
+        <div><strong>Costo total:</strong> {{ payload.costo_total_pedido }}</div>
+        {% if payload.tipo_entrega == 'Entrega personal' %}
+            <div><strong>Dia:</strong> {{ payload.fecha_entrega }}</div>
+            <div><strong>Hora:</strong> {{ payload.hora_entrega }}</div>
+            <div><strong>Lugar:</strong> {{ payload.lugar_entrega }}</div>
+        {% else %}
+            <div><strong>Ciudad destino:</strong> {{ payload.ciudad_destino }}</div>
+            <div><strong>Referencia:</strong> {{ payload.direccion_referencia or 'Sin referencia' }}</div>
+        {% endif %}
+        <div><strong>Total de productos:</strong> {{ resumen.cantidad_productos }}</div>
+    </div>
+
+    <h3>Codigos de producto</h3>
+    <ul class="list-clean">
+        {% for code in resumen.codigos %}
+            <li>{{ code }}</li>
+        {% endfor %}
+    </ul>
+
+    <form method="post" action="{{ url_for('user.registro_confirm') }}" class="form-grid single-col">
+        <button type="submit" class="btn btn-primary">Confirmar pedido</button>
+        <a href="{{ url_for('user.registro', codigo=payload.codigo_principal) }}" class="btn btn-ghost">Volver a editar</a>
+    </form>
+</section>
+{% endblock %}

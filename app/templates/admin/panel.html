@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% block title %}Panel Admin{% endblock %}
+
+{% block content %}
+<section class="card fade-up">
+    <div class="admin-head">
+        <h1>Panel de administracion</h1>
+        <form method="post" action="{{ url_for('admin.logout') }}">
+            <button class="btn btn-ghost" type="submit">Cerrar sesion</button>
+        </form>
+    </div>
+
+    <div class="kpi-grid">
+        <article class="kpi"><span>Pendientes</span><strong>{{ metrics.pending }}</strong></article>
+        <article class="kpi"><span>Entregados</span><strong>{{ metrics.delivered }}</strong></article>
+        <article class="kpi"><span>No entregados</span><strong>{{ metrics.no_entregado }}</strong></article>
+        <article class="kpi"><span>Pedidos hoy</span><strong>{{ metrics.today }}</strong></article>
+        <article class="kpi"><span>Entrega personal</span><strong>{{ metrics.personal }}</strong></article>
+        <article class="kpi"><span>Envio</span><strong>{{ metrics.envio }}</strong></article>
+    </div>
+
+    <div class="admin-tools">
+        <a href="{{ url_for('admin.config_panel') }}" class="btn btn-secondary">Gestionar configuracion</a>
+    </div>
+
+    <article class="code-generator-block">
+        <div class="code-generator-head">
+            <h2>Generar codigos</h2>
+            <p>Genera codigos unicos y compártelos por WhatsApp para que el cliente registre su pedido.</p>
+        </div>
+
+        <div class="code-generator-main">
+            <button id="generate-code-btn" type="button" class="btn btn-primary btn-lg">Generar siguiente codigo</button>
+            <div id="generated-code" class="generated-code-display">- - -</div>
+            <button id="copy-code-btn" type="button" class="btn btn-secondary">Copiar codigo</button>
+        </div>
+
+        <div class="code-stats-row">
+            <span>Disponibles: {{ code_stats.get('Disponible', 0) }}</span>
+            <span>Usados: {{ code_stats.get('Usado', 0) }}</span>
+            <span>Anulados: {{ code_stats.get('Anulado', 0) }}</span>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Codigo</th>
+                        <th>Estado</th>
+                        <th>Creacion</th>
+                        <th>Uso</th>
+                        <th>Grupo pedido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in recent_codes %}
+                    <tr>
+                        <td>{{ item.codigo }}</td>
+                        <td>{{ item.estado_codigo }}</td>
+                        <td>{{ item.fecha_creacion or '-' }}</td>
+                        <td>{{ item.fecha_uso or '-' }}</td>
+                        <td>{{ item.pedido_grupo_id or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+
+    <div class="filters-grid">
+        <input id="search-input" placeholder="Buscar por codigo, nombre, apellido o telefono">
+
+        <select id="filter-status">
+            <option value="">Estado (todos)</option>
+            {% for estado in estados %}
+                <option value="{{ estado }}" {% if estado == 'Pendiente' %}selected{% endif %}>{{ estado }}</option>
+            {% endfor %}
+            <option value="No entregado">No entregado</option>
+        </select>
+
+        <input id="filter-date" type="date" value="{{ today }}">
+
+        <select id="filter-time">
+            <option value="">Hora (todas)</option>
+            {% for item in options.horarios %}
+                <option value="{{ item.valor }}">{{ item.valor }}</option>
+            {% endfor %}
+        </select>
+
+        <select id="filter-type">
+            <option value="">Tipo entrega (todos)</option>
+            <option value="Entrega personal">Entrega personal</option>
+            <option value="Envio">Envio</option>
+        </select>
+
+        <select id="filter-place">
+            <option value="">Lugar/Ciudad (todos)</option>
+            {% for item in options.lugares %}
+                <option value="{{ item.valor }}">{{ item.valor }}</option>
+            {% endfor %}
+            {% for item in options.ciudades %}
+                <option value="{{ item.valor }}">{{ item.valor }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="table-wrap">
+        <table id="orders-table">
+            <thead>
+                <tr>
+                    <th>Codigo</th>
+                    <th>Grupo</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Telefono</th>
+                    <th>Tipo</th>
+                    <th>Lugar/Ciudad</th>
+                    <th>Dia</th>
+                    <th>Hora</th>
+                    <th>Costo total</th>
+                    <th>Estado</th>
+                    <th>WhatsApp</th>
+                    <th>Registro</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    {% set place = order.lugar_entrega or order.ciudad_destino %}
+                    {% set registro = order.fecha_registro[:10] if order.fecha_registro else '' %}
+                    <tr
+                        data-id="{{ order.id }}"
+                        data-code="{{ order.codigo_producto }}"
+                        data-name="{{ order.nombre }}"
+                        data-lastname="{{ order.apellido }}"
+                        data-phone="{{ order.telefono }}"
+                        data-status="{{ order.estado }}"
+                        data-date="{{ registro }}"
+                        data-time="{{ order.hora_entrega }}"
+                        data-type="{{ order.tipo_entrega }}"
+                        data-place="{{ place }}"
+                    >
+                        <td>{{ order.codigo_producto }}</td>
+                        <td>{{ order.pedido_grupo_id }}</td>
+                        <td>{{ order.nombre }}</td>
+                        <td>{{ order.apellido or '-' }}</td>
+                        <td>{{ order.telefono }}</td>
+                        <td>{{ order.tipo_entrega }}</td>
+                        <td>{{ place or '-' }}</td>
+                        <td>{{ order.fecha_entrega or '-' }}</td>
+                        <td>{{ order.hora_entrega or '-' }}</td>
+                        <td>{{ order.costo_total_pedido or '-' }}</td>
+                        <td>
+                            <select class="status-select">
+                                {% for estado in estados %}
+                                    <option value="{{ estado }}" {% if estado == order.estado %}selected{% endif %}>{{ estado }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            {% if order.whatsapp_url %}
+                                <a class="btn btn-light" href="{{ order.whatsapp_url }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ order.fecha_registro }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}?v=20260409"></script>
+{% endblock %}

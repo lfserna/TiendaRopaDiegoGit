@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Login Admin{% endblock %}
+
+{% block content %}
+<section class="card card-login fade-up">
+    <h1>Ingreso de administrador</h1>
+    <p>Acceso restringido para gestion de pedidos y configuraciones.</p>
+
+    <form method="post" class="form-grid single-col">
+        <label>Usuario</label>
+        <input name="username" required>
+
+        <label>Contrasena</label>
+        <input name="password" type="password" required>
+
+        <button type="submit" class="btn btn-primary">Iniciar sesion</button>
+    </form>
+</section>
+{% endblock %}

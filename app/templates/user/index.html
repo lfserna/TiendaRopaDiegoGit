@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Acceso de Cliente{% endblock %}
+
+{% block content %}
+<section class="card card-hero fade-up">
+    <h1>Introducir codigo para registrar pedido o consultar pedido</h1>
+    <p>Si ya registraste tu pedido, podras ver el estado actual y todos los productos relacionados.</p>
+
+    <form method="post" class="form-grid single-col">
+        <label for="codigo">Codigo de pedido</label>
+        <input id="codigo" name="codigo" placeholder="Ejemplo: KD-27-M" maxlength="7" required>
+        <small class="code-feedback" data-code-feedback>Formato esperado: AA-00-A</small>
+        <button type="submit" class="btn btn-primary">Continuar</button>
+    </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/user.js') }}?v=20260409"></script>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Configuracion{% endblock %}
+
+{% block content %}
+<section class="card fade-up">
+    <div class="admin-head">
+        <h1>Gestion de configuracion</h1>
+        <a class="btn btn-ghost" href="{{ url_for('admin.panel') }}">Volver al panel</a>
+    </div>
+
+    {% for sheet, items in options.items() %}
+    <article class="config-block">
+        <h2>{{ sheet|capitalize }}</h2>
+
+        <form method="post" class="inline-form">
+            <input type="hidden" name="action" value="add">
+            <input type="hidden" name="sheet" value="{{ sheet }}">
+            <input name="value" placeholder="Agregar nuevo valor" required>
+            <button class="btn btn-secondary" type="submit">Agregar</button>
+        </form>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Valor</th>
+                        <th>Activo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>
+                            <form method="post" class="inline-form">
+                                <input type="hidden" name="action" value="edit">
+                                <input type="hidden" name="sheet" value="{{ sheet }}">
+                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                <input name="value" value="{{ item.valor }}" required>
+                                <button class="btn btn-light" type="submit">Guardar</button>
+                            </form>
+                        </td>
+                        <td>{{ 'Si' if item.activo else 'No' }}</td>
+                        <td class="action-row">
+                            <form method="post">
+                                <input type="hidden" name="action" value="toggle">
+                                <input type="hidden" name="sheet" value="{{ sheet }}">
+                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                <input type="hidden" name="active" value="{{ 'false' if item.activo else 'true' }}">
+                                <button class="btn btn-light" type="submit">{{ 'Desactivar' if item.activo else 'Activar' }}</button>
+                            </form>
+
+                            <form method="post" onsubmit="return confirm('Eliminar este valor?');">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="sheet" value="{{ sheet }}">
+                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                <button class="btn btn-danger" type="submit">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}
